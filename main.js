@@ -140,6 +140,34 @@ document.addEventListener('DOMContentLoaded', () => {
         checkGameOver();
     };
 
-const $btnKick = document.getElementById('btn-kick').addEventListener('click', handleKick);
-const $btnStrongKick = document.getElementById('btn-strong-kick').addEventListener('click', handleKickStrong);
+    // Функція для підрахунку кліків і обмеження їх кількості
+    const createClickCounter = (buttonId, maxClicks) => {
+        let clickCount = 0;
+        return () => {
+            if (clickCount < maxClicks) {
+                clickCount++;
+                console.log(`${buttonId}: Кількість натискань ${clickCount}/${maxClicks}`);
+            } else {
+                console.log(`${buttonId}: Ліміт натискань вичерпано`);
+            }
+        };
+    };
+
+    // Створення лічильників для кожної кнопки
+    const kickClickCounter = createClickCounter('btn-kick', 6);
+    const strongKickClickCounter = createClickCounter('btn-strong-kick', 6);
+
+    // Повісимо обробники подій
+    const $btnKick = document.getElementById('btn-kick');
+    const $btnStrongKick = document.getElementById('btn-strong-kick');
+
+    $btnKick.addEventListener('click', () => {
+        kickClickCounter();
+        handleKick();
+    });
+
+    $btnStrongKick.addEventListener('click', () => {
+        strongKickClickCounter();
+        handleKickStrong();
+    });
 });
