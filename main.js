@@ -116,58 +116,54 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const handleKick = () => {
-        enemies.forEach(enemy => {
-            const damage = Math.floor(Math.random() * 20) + 1;
-            enemy.receiveDamage(damage, character.name);
-        });
+    const handleKick = (kickClickCounter) => {
+        if (kickClickCounter()) {
+            enemies.forEach(enemy => {
+                const damage = Math.floor(Math.random() * 20) + 1;
+                enemy.receiveDamage(damage, character.name);
+            });
 
-        const characterDamage = Math.floor(Math.random() * 20) + 1;
-        character.receiveDamage(characterDamage, enemies[Math.floor(Math.random() * enemies.length)].name);
+            const characterDamage = Math.floor(Math.random() * 20) + 1;
+            character.receiveDamage(characterDamage, enemies[Math.floor(Math.random() * enemies.length)].name);
 
-        checkGameOver();
+            checkGameOver();
+        }
     };
 
-    const handleKickStrong = () => {
-        enemies.forEach(enemy => {
-            const damage = Math.floor(Math.random() * 30) + 1;
-            enemy.receiveDamage(damage, character.name);
-        });
+    const handleKickStrong = (strongKickClickCounter) => {
+        if (strongKickClickCounter()) {
+            enemies.forEach(enemy => {
+                const damage = Math.floor(Math.random() * 30) + 1;
+                enemy.receiveDamage(damage, character.name);
+            });
 
-        const characterDamage = Math.floor(Math.random() * 30) + 1;
-        character.receiveDamage(characterDamage, enemies[Math.floor(Math.random() * enemies.length)].name);
+            const characterDamage = Math.floor(Math.random() * 30) + 1;
+            character.receiveDamage(characterDamage, enemies[Math.floor(Math.random() * enemies.length)].name);
 
-        checkGameOver();
+            checkGameOver();
+        }
     };
 
-    // Функція для підрахунку кліків і обмеження їх кількості
     const createClickCounter = (buttonId, maxClicks) => {
         let clickCount = 0;
         return () => {
             if (clickCount < maxClicks) {
                 clickCount++;
                 console.log(`${buttonId}: Кількість натискань ${clickCount}/${maxClicks}`);
+                return true;
             } else {
                 console.log(`${buttonId}: Ліміт натискань вичерпано`);
+                return false;
             }
         };
     };
 
-    // Створення лічильників для кожної кнопки
-    const kickClickCounter = createClickCounter('btn-kick', 6);
-    const strongKickClickCounter = createClickCounter('btn-strong-kick', 6);
+    const kickClickCounter = createClickCounter('btn-kick', 7);
+    const strongKickClickCounter = createClickCounter('btn-strong-kick', 7);
 
-    // Повісимо обробники подій
     const $btnKick = document.getElementById('btn-kick');
     const $btnStrongKick = document.getElementById('btn-strong-kick');
 
-    $btnKick.addEventListener('click', () => {
-        kickClickCounter();
-        handleKick();
-    });
-
-    $btnStrongKick.addEventListener('click', () => {
-        strongKickClickCounter();
-        handleKickStrong();
-    });
+    $btnKick.addEventListener('click', () => handleKick(kickClickCounter));
+    $btnStrongKick.addEventListener('click', () => handleKickStrong(strongKickClickCounter));
 });
