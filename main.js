@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log(`Кнопка натиснута ${clickCount} разів. Залишилось ${limit - clickCount} натискань.`);
                 return true;
             } else {
-                console.log('Кнопка більше не активна.');
+                console.log('Ліміт натискань вичерпано.');
                 return false;
             }
         };
