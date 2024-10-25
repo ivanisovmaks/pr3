@@ -1,23 +1,71 @@
-export const logs = [
-    '[ПЕРСОНАЖ №1] згадав щось важливе, але раптово [ПЕРСОНАЖ №2], не пам\'ятаючи себе від страху, вдарив у передпліччя ворога.',
-    '[ПЕРСОНАЖ №1] поперхнувся, і за це [ПЕРСОНАЖ №2] з переляку вдарив коліном у лоб ворога.',
-    '[ПЕРСОНАЖ №1] задумався, але в цей час нахабний [ПЕРСОНАЖ №2], прийнявши вольове рішення, безшумно підійшов ззаду і вдарив.',
-    '[ПЕРСОНАЖ №1] прийшов до тями, але раптово [ПЕРСОНАЖ №2] випадково завдав потужного удару.',
-    '[ПЕРСОНАЖ №1] поперхнувся, але в цей час [ПЕРСОНАЖ №2] неохоче роздробив кулаком ворога.',
-    '[ПЕРСОНАЖ №1] здивувався, а [ПЕРСОНАЖ №2] похитнувся і завдав підступного удару.',
-    '[ПЕРСОНАЖ №1] висморкався, але раптово [ПЕРСОНАЖ №2] завдав дроблячого удару.',
-    '[ПЕРСОНАЖ №1] похитнувся, і раптом нахабний [ПЕРСОНАЖ №2] без причини вдарив у ногу противника.',
-    '[ПЕРСОНАЖ №1] засмутився, як раптом, несподівано [ПЕРСОНАЖ №2] випадково завдав удару в живіт суперника.',
-    '[ПЕРСОНАЖ №1] намагався щось сказати, але раптом [ПЕРСОНАЖ №2] від нудьги розбив брову супротивнику.'
-];
+import { Pokemon } from './pokemon.js';
+import { getRandomLog } from './logs.js';
+import { pokemons } from './pokemons.js';
 
-export const addLog = (logsDiv, message) => {
-    const newLog = document.createElement('p');
-    newLog.textContent = message;
-    logsDiv.prepend(newLog);
-};
+export class Game {
+    constructor() {
+        this.character = null;
+        this.enemies = [];
+        this.logsDiv = document.createElement('div');
+        this.logsDiv.id = 'logs';
+        document.body.appendChild(this.logsDiv);
+    }
 
-export const getRandomLog = (logs, character1, character2) => {
-    const randomIndex = Math.floor(Math.random() * logs.length);
-    return logs[randomIndex].replace('[ПЕРСОНАЖ №1]', character1).replace('[ПЕРСОНАЖ №2]', character2);
-};
+    startGame() {
+        this.character = new Pokemon('Pikachu', 100, 'progressbar-character', 'health-character', this.addLog.bind(this));
+        this.enemies = this.createEnemies();
+        this.updateEnemyUI();
+    }
+
+    resetGame() {
+        this.character.health = this.character.maxHealth;
+        this.character.updateHealthBar();
+        this.enemies.forEach(enemy => {
+            enemy.health = enemy.maxHealth;
+            enemy.updateHealthBar();
+        });
+        this.logsDiv.innerHTML = '';
+        this.startGame();
+    }
+
+    createEnemies() {
+        return [this.createRandomEnemy(), this.createRandomEnemy()];
+    }
+
+    createRandomEnemy() {
+        const randomIndex = Math.floor(Math.random() * pokemons.length);
+        const enemyData = pokemons[randomIndex];
+        return new Pokemon(enemyData.name, enemyData.hp, `progressbar-enemy`, `health-enemy`, this.addLog.bind(this));
+    }
+
+    updateEnemyUI() {
+        this.enemies.forEach((enemy, index) => {
+            document.getElementById(`name-enemy${index + 1}`).textContent = enemy.name;
+        });
+    }
+
+    addLog(message) {
+        const newLog = document.createElement('p');
+        newLog.textContent = message;
+        this.logsDiv.prepend(newLog);
+    }
+
+    checkGameOver() {
+        const allEnemiesDefeated = this.enemies.every(({ health }) => health <= 0);
+        const isCharacterDefeated = this.character.health <= 0;
+
+        if (isCharacterDefeated && allEnemiesDefeated) {
+            this.addLog('Нічия! Всі учасники бою втратили здоров\'я!');
+            alert('Draw! Everyone lost!');
+            location.reload();
+        } else if (isCharacterDefeated) {
+            this.addLog('Гра закінчена! Пікачу програв!');
+            alert('Game Over! Pikachu has lost!');
+            location.reload();
+        } else if (allEnemiesDefeated) {
+            this.addLog('Вітаємо! Пікачу переміг усіх ворогів!');
+            alert('Congratulations! Pikachu has won!');
+            location.reload();
+        }
+    }
+}
